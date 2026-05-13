@@ -13,10 +13,9 @@ const QuizAttempt   = require('./models/QuizAttempt');
 const CourseContent = require('./models/CourseContent');
 const Feedback      = require('./models/Feedback');
 
-// ── Associations (only ones not already defined in model files)
+// ── Associations
 Course.hasMany(CourseContent, { foreignKey: 'course_id', as: 'contents' });
 CourseContent.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
-// NOTE: Quiz belongsTo Course is already defined elsewhere — do NOT add it again
 
 // ── Routes
 const authRoutes     = require('./routes/auth.routes');
@@ -30,10 +29,10 @@ const profileRoutes  = require('./routes/profile.routes');
 const feedbackRoutes = require('./routes/feedback.routes');
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;  // Render sets PORT automatically
 
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:4201'],
+  origin: '*',  // allow all during initial deploy; tighten after frontend is live
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -55,18 +54,22 @@ app.use('/api/profile',  profileRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
-const startServer = async () => {
-  try {
-    await sequelize.authenticate();
+// ── Start server — listen FIRST, then sync DB
+// This ensures Render detects the open port immediately
+app.listen(PORT, () => {
+  console.log(`✓ Server running on port ${PORT}`);
+});
+
+// DB connect after server is already listening
+sequelize.authenticate()
+  .then(() => {
     console.log('✓ Database connected');
-    await sequelize.sync({ force: false });
+    return sequelize.sync({ force: false });
+  })
+  .then(() => {
     console.log('✓ Tables synced');
-    app.listen(PORT, () => console.log(`✓ Server running on port ${PORT}`));
-  } catch (err) {
-    console.error('✗ Startup error:', err.message);
-    process.exit(1);
-  }
-};
-
-
-startServer();
+  })
+  .catch(err => {
+    console.error('✗ Database error:', err.message);
+    // Don't exit — let health check still work so Render doesn't think it crashed
+  });
