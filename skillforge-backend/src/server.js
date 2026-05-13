@@ -32,7 +32,10 @@ const app  = express();
 const PORT = process.env.PORT || 3000;  // Render sets PORT automatically
 
 app.use(cors({
-  origin: '*',  // allow all during initial deploy; tighten after frontend is live
+  origin: [
+              'http://localhost:4200',
+              'https://skillforge-learning.vercel.app'  // ← add your Vercel URL
+            ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
