@@ -1,24 +1,24 @@
-SkillForge — AI-Driven Adaptive Learning Platform
+## SkillForge — AI-Driven Adaptive Learning Platform
 
 A full-stack e-learning platform with AI-powered quiz generation, role-based dashboards, and real-time analytics.
 
-📌 Overview :
+## 📌 Overview :
 
 SkillForge is a full-stack adaptive learning platform where Instructors create courses, upload content, and generate quizzes using AI, Students learn from courses, take timed quizzes, and track their progress, Admins manage users, courses, and monitor platform analytics
 
 The standout feature is AI Quiz Generation — instructors enter a topic and the platform instantly generates a complete MCQ quiz using the Groq API with LLaMA 3.3 70B.
 
-🚀 Live Demo
+## 🚀 Live Demo
 
-Frontend	--  https://skillforge-learning.vercel.app
+**Frontend**	--  https://skillforge-learning.vercel.app
 
-Backend API	 --  https://skillforge-backend.onrender.com
+**Backend API**	 --  https://skillforge-backend.onrender.com
 
 Demo Accounts : Register fresh accounts on the live site using the Register page. Choose your role — Student, Instructor, or Admin.
 
-✨ Features =>
+## ✨ Features =>
 
-👨‍🏫 Instructor Panel :
+**👨‍🏫 Instructor Panel :**
 
 - Create, edit, publish and delete courses
 - Upload video lessons and PDF documents with drag & drop and real-time progress bar
@@ -29,7 +29,7 @@ Demo Accounts : Register fresh accounts on the live site using the Register page
 - View student feedback with star ratings and comments
 - Analytics dashboard with Chart.js — avg scores, pass rates, attempt trends
 
-🎓 Student Panel :
+**🎓 Student Panel :**
 - Browse all published courses
 - Full course content viewer — video player, PDF iframe, link opener
 - Take quizzes with countdown timer and question navigation
@@ -37,15 +37,15 @@ Demo Accounts : Register fresh accounts on the live site using the Register page
 - Leave star ratings and feedback after each quiz
 - Progress page with 3 charts — score trend, course comparison, pass/fail ratio
 
-🛡️ Admin Panel :
+**🛡️ Admin Panel :**
 - View all platform users with role filter, remove users
 - View and delete all courses across the platform
 - AI Logs — complete history of all AI-generated quizzes
 - Reports page with 4 charts — platform overview, users by role, performance trend, content breakdown
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-Frontend :
+**Frontend :**
 
 - Angular 19 - Frontend framework
 - Angular Signals -	Reactive state management
@@ -54,7 +54,7 @@ Frontend :
 - Chart.js 4.4 - Data visualization (bar, line, pie, doughnut)
 - SCSS - Styling with design system
 
-Backend : 
+**Backend :**
 
 - Node.js + Express	- REST API server
 - Sequelize ORM -	Database abstraction
@@ -63,47 +63,50 @@ Backend :
 - Multer - File upload handling
 - CORS - Cross-origin request handling
 
-AI & Database : 
+**AI & Database :** 
 
 - Groq API - AI inference (fast LLM hosting)
 - LLaMA 3.3 70B -	Quiz generation model
 - PostgreSQL (Neon)	- Production database
 - MySQL	- Local development database
 
-Deployment :
+**Deployment :**
 - Vercel - Frontend hosting
 - Render - Backend hosting
 - Neon	- Serverless PostgreSQL
 - GitHub	- Version control & CI/CD
 
-🔐 Security : 
+## 🔐 Security : 
 - Passwords hashed with bcryptjs (salt rounds: 10)
 - JWT tokens signed with secret, expire in 7 days
 - HTTP Interceptor auto-attaches token to every request
 - Role-based middleware — authenticate + authorize on every protected route
 - CORS configured to allow only the Vercel frontend domain
 
-🚀 Deployment :
+## 🚀 Deployment :
 
-=> Frontend → Vercel :
+**=> Frontend → Vercel :**
 - Build command: npx ng build --configuration production
 - Output directory: dist/skillforge/browser
 - vercel.json rewrite rule handles Angular client-side routing
   
-=> Backend → Render :
+**=> Backend → Render :**
 - Root directory: skillforge-backend
 - Start command: node src/server.js
 - Environment variables set in Render dashboard
   
-=> Database → Neon :
+**=> Database → Neon :**
 - Serverless PostgreSQL
 - Sequelize auto-syncs tables on startup
 - SSL connection required (rejectUnauthorized: false)
 
-👨‍💻 Author
-Dandalamani
+---
+## 👨‍💻 Author
+**Dandalamani**
 
 GitHub: @Dandalamani
+---
 
-📄 License
+## 📄 License
 This project is open source and available under the MIT License.
+---
