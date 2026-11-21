@@ -6,8 +6,13 @@ const QuizAttempt = require('../models/QuizAttempt');
 const Course = require('../models/Course');
 const { updateQuiz } = require('./quiz.update');
 
-// ── Groq free-tier limits ──────────────────────────────────────────────────
-// Free tier: 6000 requests/day, 30 req/min
+// ── Groq config ────────────────────────────────────────────────────────────
+// llama-3.3-70b-versatile was shut down by Groq on Aug 16, 2026.
+// Model is now configurable via the GROQ_MODEL env var.
+// Recommended: openai/gpt-oss-120b  or  qwen/qwen3.6-27b
+const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
+// Free-tier limits (adjust to match your Groq plan)
 const DAILY_LIMIT = 6000;
 const MINUTE_LIMIT = 30;
 const WARN_AT_PERCENT = 80; // warn at 80%
@@ -62,7 +67,6 @@ const getAiUsage = (req, res) => {
   return res.status(200).json({ usage: getUsageSummary() });
 };
 
-// GET /api/quizzes
 // GET /api/quizzes
 const getQuizzes = async (req, res) => {
   try {
@@ -189,9 +193,23 @@ Return ONLY a valid JSON array with no markdown, no explanation, just raw JSON:
     "correct_answer": "A) option1",
     "explanation": "Brief explanation why this is correct"
   }
-]`;
+]
+The "correct_answer" value must be copied exactly from one of the "options" strings.`;
 
-    console.log(`[AI Quiz] Generating ${num_questions} questions on "${topic}" using Groq (llama-3.3-70b)`);
+    console.log(`[AI Quiz] Generating ${num_questions} questions on "${topic}" using Groq (${GROQ_MODEL})`);
+
+    // ── Build request body ──
+    const requestBody = {
+      model: GROQ_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      // Reasoning models (gpt-oss) spend tokens on thinking, so allow more headroom
+      max_tokens: 6000,
+    };
+    // Keep gpt-oss thinking short so the JSON answer is not truncated
+    if (GROQ_MODEL.includes('gpt-oss')) {
+      requestBody.reasoning_effort = 'low';
+    }
 
     // ── Call Groq API ──
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -200,12 +218,7 @@ Return ONLY a valid JSON array with no markdown, no explanation, just raw JSON:
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 3000,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!groqRes.ok) {
@@ -229,6 +242,9 @@ Return ONLY a valid JSON array with no markdown, no explanation, just raw JSON:
     let rawText = aiData?.choices?.[0]?.message?.content || '';
 
     console.log('[Groq Raw]', rawText.substring(0, 200));
+
+    // ── Strip <think> blocks (some reasoning models include them) ──
+    rawText = rawText.replace(/<think>[\s\S]*?<\/think>/gi, '');
 
     // ── Strip markdown fences ──
     rawText = rawText.trim()
@@ -330,4 +346,7 @@ const submitQuizAttempt = async (req, res) => {
   }
 };
 
-module.exports = { getQuizzes, getQuizById, createQuiz, generateAIQuiz, submitQuizAttempt, getAiUsage,publishQuiz, unpublishQuiz, deleteQuiz, updateQuiz};
+module.exports = {
+  getQuizzes, getQuizById, createQuiz, generateAIQuiz, submitQuizAttempt,
+  getAiUsage, publishQuiz, unpublishQuiz, deleteQuiz, updateQuiz,
+};
